@@ -350,6 +350,7 @@ class Component(object):
         self.keywords = []
         self.categories = []
         self.custom = {}
+        self.bundle = {}
 
     def to_xml(self):
         xml = '  <component type="firmware">\n'
@@ -367,6 +368,9 @@ class Component(object):
             xml += '    <project_license>%s</project_license>\n' % self.project_license
         if self.description:
             xml += '    <description>%s</description>\n' % self.description
+        if self.bundle:
+            xml += '    <bundle type="%s" runtime="%s" sdk="%s">%s</bundle>\n' % \
+                   (self.bundle['type'], self.bundle['runtime'], self.bundle['sdk'], self.bundle['value'])
         for key in self.urls:
             xml += '    <url type="%s">%s</url>\n' % (key, self.urls[key])
         for key in self.icons:
@@ -655,7 +659,22 @@ class Component(object):
                     key = c1.attrib['type']
                 self.urls[key] = c1.text
 
+            # <icon>
             elif c1.tag == 'icon':
                 key = c1.attrib.pop('type', 'unknown')
                 c1.attrib['value'] = c1.text
                 self.icons[key] = self.icons.get(key, []) + [c1.attrib]
+
+            # <bundle>
+            elif c1.tag == 'bundle':
+                type = c1.attrib.pop('type', 'unknown')
+                runtime = c1.attrib.pop('runtime', 'unknown')
+                sdk = c1.attrib.pop('sdk', 'unknown')
+                value = c1.text
+                self.bundle = {
+                    'type': type,
+                    'runtime': runtime,
+                    'sdk': sdk,
+                    'value': value
+                }
+
