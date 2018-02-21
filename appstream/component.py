@@ -369,8 +369,13 @@ class Component(object):
         if self.description:
             xml += '    <description>%s</description>\n' % self.description
         if self.bundle:
-            xml += '    <bundle type="%s" runtime="%s" sdk="%s">%s</bundle>\n' % \
-                   (self.bundle['type'], self.bundle['runtime'], self.bundle['sdk'], self.bundle['value'])
+            xml += '    <bundle type="%(type)" %(runtime) %(sdk)>%(value)</bundle>\n' % \
+                   {
+                       'type': self.bundle['type'],
+                       'runtime': ('runtime="%s"' % self.bundle['runtime']) if self.bundle['runtime'] != 'unknown' else "",
+                       'sdk': ('sdk="%s"' % self.bundle['sdk']) if self.bundle['sdk'] != 'unknown' else "",
+                       'value': self.bundle['value']
+                   }
         for key in self.urls:
             xml += '    <url type="%s">%s</url>\n' % (key, self.urls[key])
         for key in self.icons:
